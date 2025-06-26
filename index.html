@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>현재 상영 영화 분석</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Sans KR', sans-serif;
+        }
+        .rating-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 500;
+            font-size: 0.875rem;
+            gap: 0.375rem;
+        }
+        .naver-badge {
+            background-color: #03c75a;
+            color: white;
+        }
+        .daum-badge {
+            background-color: #000;
+            color: white;
+        }
+        .kofic-badge {
+            background-color: #ce1f31;
+            color: white;
+        }
+        .reservation-badge {
+            background-color: #4f46e5;
+            color: white;
+        }
+        .card-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        /* 이미지 로딩 전 높이 유지 */
+        .poster-img {
+            aspect-ratio: 500 / 714;
+            background-color: #e5e7eb; /* Gray-200 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-900">현재 상영 영화 분석</h1>
+            <p class="text-md md:text-lg text-gray-600 mt-2">2025년 개봉 예정작 기반의 흥행 예측 데이터입니다.</p>
+        </header>
+
+        <main id="movie-list" class="card-container">
+            <!-- 영화 정보 카드가 여기에 동적으로 삽입됩니다. -->
+        </main>
+        
+        <footer class="text-center mt-12 text-gray-500 text-sm">
+            <p>※ 본 정보는 2025년 개봉 예정작을 기반으로 구성된 가상 데이터입니다.</p>
+            <p>※ 포스터는 공식 이미지를 사용했습니다.</p>
+            <p>데이터 기준일: 2025년 6월 26일</p>
+        </footer>
+    </div>
+
+    <script>
+        // --- 데이터 영역 ---
+        // 예매율(naverReservation, daumReservation) 정보를 추가했습니다.
+        const movies = [
+             {
+                title: "F1",
+                posterUrl: "https://image.tmdb.org/t/p/w500/sK64G0k0b2gD3IZt2A46iXw4b8g.jpg",
+                fallbackUrl: "https://placehold.co/500x714/E64A19/FFFFFF?text=F1",
+                releaseDate: "2025.06.25",
+                genre: "액션/드라마",
+                naverRating: 8.90,
+                daumRating: 8.7,
+                boxOfficeRank: 1,
+                boxOfficeAudience: "550_000",
+                naverReservation: 35.5,
+                daumReservation: 33.8
+            },
+            {
+                title: "엘리오",
+                posterUrl: "https://image.tmdb.org/t/p/w500/pMWt1qf2h9bGSoKxT2tKBot0t8N.jpg",
+                fallbackUrl: "https://placehold.co/500x714/388E3C/FFFFFF?text=Elio",
+                releaseDate: "2025.06.13",
+                genre: "SF/애니메이션",
+                naverRating: 9.35,
+                daumRating: 9.1,
+                boxOfficeRank: 2,
+                boxOfficeAudience: "2_880_000",
+                naverReservation: 22.1,
+                daumReservation: 24.5
+            },
+            {
+                title: "미션 임파서블: 파이널 레코닝",
+                posterUrl: "https://image.tmdb.org/t/p/w500/NNxYkU70HPurnNCSiCjYUkE4C07.jpg",
+                fallbackUrl: "https://placehold.co/500x714/00796B/FFFFFF?text=MI:+Final+Reckoning",
+                releaseDate: "2025.05.23",
+                genre: "액션/첩보",
+                naverRating: 9.05,
+                daumRating: 8.7,
+                boxOfficeRank: 3,
+                boxOfficeAudience: "7_850_000",
+                naverReservation: 15.8,
+                daumReservation: 14.2
+            },
+            {
+                title: "판타스틱 4",
+                posterUrl: "https://image.tmdb.org/t/p/w500/vW2l8p5LW3f6n42oGEaO1c6n0Fh.jpg",
+                fallbackUrl: "https://placehold.co/500x714/0288D1/FFFFFF?text=Fantastic+4",
+                releaseDate: "2025.05.02",
+                genre: "액션/SF/어드벤처",
+                naverRating: 9.05,
+                daumRating: 8.8,
+                boxOfficeRank: 4,
+                boxOfficeAudience: "4_150_000",
+                naverReservation: 11.3,
+                daumReservation: 10.9
+            },
+            {
+                title: "캡틴 아메리카: 브레이브 뉴 월드",
+                posterUrl: "https://image.tmdb.org/t/p/w500/gg2Vn2S9BfVn0oQd8u0S13luoA.jpg",
+                fallbackUrl: "https://placehold.co/500x714/1976D2/FFFFFF?text=Captain+America+4",
+                releaseDate: "2025.02.14",
+                genre: "액션/SF",
+                naverRating: 8.76,
+                daumRating: 8.4,
+                boxOfficeRank: 5,
+                boxOfficeAudience: "6_500_000",
+                naverReservation: 8.2,
+                daumReservation: 9.5
+            },
+            {
+                title: "백설공주",
+                posterUrl: "https://image.tmdb.org/t/p/w500/iP23s342Nl6z4sUQtLajG5aK4pY.jpg",
+                fallbackUrl: "https://placehold.co/500x714/FFFFFF/000000?text=Snow+White",
+                releaseDate: "2025.03.21",
+                genre: "판타지/뮤지컬",
+                naverRating: 7.50,
+                daumRating: 7.1,
+                boxOfficeRank: 6,
+                boxOfficeAudience: "4_200_000",
+                naverReservation: 5.1,
+                daumReservation: 4.8
+            }
+        ];
+
+        // --- UI 생성 함수 ---
+        function createMovieCard(movie) {
+             const audience = parseInt(movie.boxOfficeAudience.replace(/_/g, ''), 10);
+            return `
+                <div class="bg-white rounded-lg shadow-lg overflow-hidden transform hover:-translate-y-2 transition-transform duration-300">
+                    <img src="${movie.posterUrl}" alt="${movie.title} 포스터" class="w-full h-auto object-cover poster-img" onerror="this.onerror=null;this.src='${movie.fallbackUrl}';">
+                    <div class="p-5">
+                        <h2 class="text-xl font-bold truncate">${movie.title}</h2>
+                        <p class="text-sm text-gray-500 mt-1">${movie.genre} · ${movie.releaseDate} 개봉</p>
+                        
+                        <div class="mt-4 space-y-3">
+                            <!-- 예매율 정보 -->
+                            <div class="flex items-start">
+                                <span class="w-16 text-sm font-semibold text-gray-700 pt-1">예매율</span>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="rating-badge reservation-badge">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-ticket-detailed" viewBox="0 0 16 16">
+                                          <path d="M4 5.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5Zm0 2a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5Zm0 2a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5Z"/>
+                                          <path d="M1.5 3A1.5 1.5 0 0 0 0 4.5V6a.5.5 0 0 0 .5.5 1.5 1.5 0 1 1 0 3 .5.5 0 0 0-.5.5v1.5A1.5 1.5 0 0 0 1.5 13h13a1.5 1.5 0 0 0 1.5-1.5V10a.5.5 0 0 0-.5-.5 1.5 1.5 0 1 1 0-3 .5.5 0 0 0 .5-.5V4.5A1.5 1.5 0 0 0 14.5 3h-13ZM1 4.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v1.05a2.5 2.5 0 0 0 0 4.9v1.05a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-1.05a2.5 2.5 0 0 0 0-4.9V4.5Z"/>
+                                        </svg>
+                                        네이버 ${movie.naverReservation}%
+                                    </span>
+                                    <span class="rating-badge reservation-badge">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-ticket-detailed" viewBox="0 0 16 16">
+                                          <path d="M4 5.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5Zm0 2a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5Zm0 2a.5.5 0 0 1 .5-.5h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5Z"/>
+                                          <path d="M1.5 3A1.5 1.5 0 0 0 0 4.5V6a.5.5 0 0 0 .5.5 1.5 1.5 0 1 1 0 3 .5.5 0 0 0-.5.5v1.5A1.5 1.5 0 0 0 1.5 13h13a1.5 1.5 0 0 0 1.5-1.5V10a.5.5 0 0 0-.5-.5 1.5 1.5 0 1 1 0-3 .5.5 0 0 0 .5-.5V4.5A1.5 1.5 0 0 0 14.5 3h-13ZM1 4.5a.5.5 0 0 1 .5-.5h13a.5.5 0 0 1 .5.5v1.05a2.5 2.5 0 0 0 0 4.9v1.05a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5v-1.05a2.5 2.5 0 0 0 0-4.9V4.5Z"/>
+                                        </svg>
+                                        다음 ${movie.daumReservation}%
+                                    </span>
+                                </div>
+                            </div>
+                            <!-- 평점 정보 -->
+                            <div class="flex items-start">
+                                <span class="w-16 text-sm font-semibold text-gray-700 pt-1">평점</span>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="rating-badge naver-badge">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 17.75l-6.172 3.245 1.179-6.873-4.993-4.867 6.9-1.002L12 2l3.086 6.253 6.9 1.002-4.993 4.867 1.179 6.873z"></path></svg>
+                                        네이버 ${movie.naverRating.toFixed(2)}
+                                    </span>
+                                    <span class="rating-badge daum-badge">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"></path></svg>
+                                        다음 ${movie.daumRating.toFixed(1)}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <!-- 흥행 정보 -->
+                            <div class="flex items-start">
+                                <span class="w-16 text-sm font-semibold text-gray-700 pt-1">흥행</span>
+                                <div class="flex flex-wrap gap-2">
+                                     <span class="rating-badge kofic-badge">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>
+                                        ${movie.boxOfficeRank}위
+                                    </span>
+                                    <span class="text-sm text-gray-600 self-center"> 누적 ${audience.toLocaleString()}명</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // --- 애플리케이션 초기화 ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const movieListElement = document.getElementById('movie-list');
+            
+            // 데이터 정렬 (예매율 순서로 변경)
+            const sortedMovies = movies.sort((a, b) => b.naverReservation - a.naverReservation);
+
+            // 영화 카드 생성 및 삽입
+            if (movieListElement && sortedMovies.length > 0) {
+                movieListElement.innerHTML = sortedMovies.map(createMovieCard).join('');
+            } else if (movieListElement) {
+                movieListElement.innerHTML = '<p class="text-center col-span-full">현재 상영 영화 정보를 불러올 수 없습니다.</p>';
+            }
+        });
+
+    </script>
+</body>
+</html>
